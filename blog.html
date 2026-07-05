@@ -61,16 +61,58 @@
         </nav>
     </header>
 
-    <div class="container">
+<div class="container">
         <h2>Latest Updates</h2>
-
-        <div class="blog-post">
-            <h3>Setting up the Minecraft Realm</h3>
-            <span class="post-date">July 5, 2026</span>
-            <p>Spent the weekend tinkering with the dueling addon and world for the bedrock realm. The goal is to have a functionable, centralized interaction system implemented to the realm within a month. There have been a lot of advertising efforts on my end and trying to form new friendships has been tough, but I am finding the Minecraft community to be very chill and mostly abiding by our peaceful server rules. However, we do have an issue currently with players throwing down custom builds into the world and then immediately leaving. Potential fixes involve removng the custom bases starter pack from the starting inventory via command blocks or custom scripting. Still not exactly sure how I'm going to approach this but I will provide updates as they happen.</p>
+        
+        <div id="blog-posts-container">
+            <p style="color: #aaaaaa;">Loading the latest dimension logs...</p>
         </div>
-
     </div>
+
+    <script>
+        // 1. Define your Contentful credentials
+        const SPACE_ID = 'dd71a5uebgrd';
+        const ACCESS_TOKEN = 'gbIUByaKgrFFwJaRv_M4uJhB-Sy7-cljqVS4xiDiOJQ';
+        
+        // 2. The Contentful API URL
+        const URL = `https://cdn.contentful.com/spaces/${SPACE_ID}/environments/master/entries?content_type=blogPost`;
+
+        // 3. Fetch the data from the CMS
+        fetch(URL, {
+            headers: {
+                'Authorization': `Bearer ${ACCESS_TOKEN}`
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('blog-posts-container');
+            container.innerHTML = ''; // Clear the "Loading..." text
+
+            // 4. Loop through each post and create the HTML
+            data.items.forEach(item => {
+                // Extract the data from Contentful's JSON structure
+                const title = item.fields.title;
+                const date = new Date(item.fields.date).toLocaleDateString();
+                const content = item.fields.content;
+
+                // Build the HTML block for the post
+                const postHTML = `
+                    <div class="blog-post">
+                        <h3>${title}</h3>
+                        <span class="post-date">${date}</span>
+                        <p>${content}</p>
+                    </div>
+                `;
+                
+                // Add the new block to the webpage
+                container.innerHTML += postHTML;
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching posts:', error);
+            document.getElementById('blog-posts-container').innerHTML = '<p>Failed to load posts. The dimension is currently unstable.</p>';
+        });
+    </script>
 
 </body>
 </html>
