@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Videos — The Doipyyy Dimension</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a;
+            color: #f4f4f4;
+        }
+        header {
+            background: #2a2a2a;
+            color: #fff;
+            padding: 2rem 0;
+            text-align: center;
+            border-bottom: 3px solid #ff4500;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            padding: 2rem 0;
+        }
+        a { color: #ff4500; text-decoration: none; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+        .card {
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+        .card:hover { border-color: #ff4500; }
+        .card img { width: 100%; display: block; aspect-ratio: 9 / 16; object-fit: cover; }
+        .card .title { padding: 0.75rem; font-size: 0.9rem; }
+        .empty { color: #999; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>The Doipyyy Dimension</h1>
+        <p>My TikTok uploads.</p>
+        <nav style="margin-top: 15px;">
+            <a href="index.html" style="margin-right: 15px; font-weight: bold;">Home</a>
+            <a href="blog.html" style="margin-right: 15px; font-weight: bold;">Blog</a>
+            <a href="servers.html" style="margin-right: 15px; font-weight: bold;">Servers</a>
+            <a href="videos.html" style="font-weight: bold;">Videos</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h2>Videos</h2>
+        <div id="grid" class="grid"></div>
+        <p id="status" class="empty">Loading…</p>
+    </div>
+
+    <script>
+        fetch('videos.enriched.json')
+            .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+            .then(data => {
+                const grid = document.getElementById('grid');
+                const status = document.getElementById('status');
+                const vids = (data && data.videos) || [];
+                if (!vids.length) { status.textContent = 'No videos yet.'; return; }
+                status.remove();
+                for (const v of vids) {
+                    const a = document.createElement('a');
+                    a.href = v.url;
+                    a.target = '_blank';
+                    a.rel = 'noopener';
+                    a.className = 'card';
+                    a.innerHTML =
+                        (v.thumbnail ? `<img src="${v.thumbnail}" alt="" loading="lazy">` : '') +
+                        `<div class="title">${(v.title || 'Untitled').replace(/</g, '&lt;')}</div>`;
+                    grid.appendChild(a);
+                }
+            })
+            .catch(err => {
+                document.getElementById('status').textContent =
+                    'Could not load videos (' + err.message + ').';
+            });
+    </script>
+</body>
+</html>
